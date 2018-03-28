@@ -196,12 +196,17 @@ server <- function(input, output){
   output$data_groupby <- renderDataTable({
     
     n <- length(input$dimension_cross) - 1
-    dim_cross <- input$dimension_cross
-    for(i in 1:n){
-      char_vol <- paste0(dim_cross[i],", ",dim_cross[i+1])
-      dim_cross[i+1] <- char_vol
+    if(n == 0){
+      char_fin <- input$dimension_cross
     }
-    char_fin <- dim_cross[n+1]
+    else{
+      dim_cross <- input$dimension_cross
+      for(i in 1:n){
+        char_vol <- paste0(dim_cross[i],", ",dim_cross[i+1])
+        dim_cross[i+1] <- char_vol
+      }
+      char_fin <- dim_cross[n+1]
+    }
     gmv_groupby <- paste0("SELECT CK_DATE, ",char_fin, ", SUM(GMV) AS GMV FROM P_GC_SHP_T.CBT_DIAGNOSE_TOOL_SUMMARY GROUP BY CK_DATE, ",char_fin)
     gmv_groupby_data <- data.table(sqlQuery(hopper,gmv_groupby))
     gmv_groupby_data
